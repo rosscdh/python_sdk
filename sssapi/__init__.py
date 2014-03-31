@@ -22,9 +22,15 @@ class Client(object):
         response = requests.post(self.get_api_url(method=method), 
                                  data=data_dict, auth=self.auth)
         
-        if response.status_code >= 500:
+        if response.status_code[0] == 5:  # Handle 5xx errors
             return {"error": "Server error while contacting %s. Data: %s" % (
                 self.get_api_url(method=method), str(data_dict)),
                     "code": 20}
+
+        elif response.status_code[0] == 4: ## Handle 4xx errors
+            return {"error": "400 error while contacting %s. Data: %s" % (
+                self.get_api_url(method=method), str(data_dict)),
+                    "code": 20}
+
         else:
             return response.json()
